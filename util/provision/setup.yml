@@ -6,9 +6,6 @@
     ###
     # Essentials
     ###
-#    - name: update packages
-#      command: yum update
-
     - name: get rpmforge repo
       command: wget http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
 
@@ -37,12 +34,29 @@
     - name: set host name
       command: echo "phptest.dev" > /etc/hostname
 
+    ###
+    # Installing supervisord
+    ###
+    - name: install python tools
+      yum: pkg=python-setuptools state=installed
+
+    - name: install supervisor
+      command: easy_install supervisor
+
+    - name: install supervisor control script
+      copy: src=files/supervisord dest=/etc/rc.d/init.d/supervisord mode=0755
+
+    - name: default supervisor config
+      copy: src=files/supervisord.conf dest=/etc/supervisord.conf mode=0644
+
+    - name: install superlance
+      command: easy_install superlance
 
     ###
-    # Creating directories
+    # Configuring supervisord
     ###
-    - name: setup app symlink
-      command: ln -s /vagrant /opt/phptest
+    - name: install supervisor server config
+      copy: src=files/server.conf dest=/etc/supervisor/conf.d/ mode=0644
 
     ###
     # PHP setup
@@ -64,5 +78,9 @@
       - php56w-mysql
 
     ###
-    # MySQL setup
+    # Finalizing
     ###
+    - name: restart supervisor
+      service: >
+        name=supervisord
+        state=restarted
