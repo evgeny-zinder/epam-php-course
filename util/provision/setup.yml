@@ -75,6 +75,7 @@
       - php56w-curl
       - php56w-mcrypt
       - php56w-pdo
+      - php56w-xml
       - php56w-mysql
 
     ###
