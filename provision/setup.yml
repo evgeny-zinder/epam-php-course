@@ -1,0 +1,68 @@
+---
+- hosts: all
+  sudo: true
+  tasks:
+
+    ###
+    # Essentials
+    ###
+#    - name: update packages
+#      command: yum update
+
+    - name: get rpmforge repo
+      command: wget http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
+
+    - name: add rpmforge repo
+      command: rpm -Uhv rpmforge-release*.rf.x86_64.rpm
+
+    - name: install essential packages
+      yum: pkg={{item}} state=installed
+      with_items:
+      - mc
+      - htop
+      - vim
+      - git
+      - fish
+      - libselinux-python
+
+    - name: enable fish as default shell for vagrant user
+      command: chsh vagrant -s /usr/bin/fish
+
+    - name: enable fish as default shell for root user
+      command: chsh root -s /usr/bin/fish
+
+    - name: set host name temporarily
+      command: hostname phptest.dev
+
+    - name: set host name
+      command: echo "phptest.dev" > /etc/hostname
+
+
+    ###
+    # Creating directories
+    ###
+    - name: setup app symlink
+      command: ln -s /vagrant /opt/phptest
+
+    ###
+    # PHP setup
+    ###
+    - name: add php repo
+      command: rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
+
+    - name: add another php repo
+      command: rpm -Uvh https://mirror.webtatic.com/yum/el6/latest.rpm
+
+    - name: install PHP modules
+      yum: pkg={{item}} state=installed
+      with_items:
+      - php56w-cli
+      - php56w-json
+      - php56w-curl
+      - php56w-mcrypt
+      - php56w-pdo
+      - php56w-mysql
+
+    ###
+    # MySQL setup
+    ###
