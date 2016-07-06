@@ -41,4 +41,39 @@ $app->get('/members/{id}', function (Request $request, Response $response) use (
     return $response;
 });
 
+$app->post('/members', function (Request $request, Response $response) use ($entityManager) {
+    /** @var \rms\db\repositories\MembersRepository $membersRepo */
+    $membersRepo = $entityManager->getRepository('members');
+
+    $memberData = [];
+    $memberFields = ['name', 'eid', 'email', 'slack', 'jenkins', 'jira', 'cellular', 'photo'];
+    foreach ($memberFields as $field) {
+        $memberData[$field] = $request->getAttribute($field);
+    }
+    $entity = $membersRepo->createEntity($memberData);
+    $entity->save();
+
+    $response
+        ->withStatus(201, 'Created')
+        ->withHeader('Location', '/members/' . $entity->getId())
+        ->getBody()->write(json_encode([]));
+
+    return $response;
+});
+
+$app->delete('/members/{id}', function (Request $request, Response $response) use ($entityManager) {
+    $memberId = $request->getAttribute('id');
+
+    /** @var \rms\db\repositories\MembersRepository $membersRepo */
+    $membersRepo = $entityManager->getRepository('members');
+    $membersRepo->delete($memberId);
+
+    $response
+        ->withStatus(200)
+        ->getBody()->write(json_encode([]));
+
+    return $response;
+});
+
+
 $app->run();

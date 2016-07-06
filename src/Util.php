@@ -10,7 +10,12 @@ class Util
 {
     /**
      * Error-safe recursive array item getter
-     * Translates path "a.b.c" to 'a' => ['b' => ['c' => ... ]]]
+     * Translates path "a.b.c" to
+     * 'a' => [
+     *     'b' => [
+     *         'c' => <value you will get>
+     *     ]
+     * ]
      * @param array $array
      * @param string $path
      * @return mixed
